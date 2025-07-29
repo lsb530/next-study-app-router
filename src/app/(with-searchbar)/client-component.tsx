@@ -1,8 +1,8 @@
 "use client"
 
-import ServerComponent from "@/app/(with-searchbar)/server-component";
+import {ReactNode} from "react";
 
-export default function ClientComponent() {
+export default function ClientComponent({children}: { children: ReactNode }) {
   console.log("클라이언트 컴포넌트!")
-  return <ServerComponent/>
+  return <div>{children}</div>
 }
