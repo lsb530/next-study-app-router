@@ -2,6 +2,7 @@ import BookItem from "@/components/book-item";
 import {BookData} from "@/types";
 import {delay} from "@/util/delay";
 import {Suspense} from "react";
+import BookListSkeleton from "@/components/skeleton/book-list-skeleton";
 
 // 모든 동적 페이지에서 필요한 데이터들이 undefined가 됨(ex: searchParams)
 // export const dynamic = "force-static"
@@ -37,7 +38,10 @@ export default function Page({
   searchParams: { q?: string };
 }) {
   return (
-    <Suspense key={searchParams.q || ""} fallback={<div>Loading ...</div>}>
+    <Suspense
+      key={searchParams.q || ""}
+      fallback={<BookListSkeleton count={3}/>}
+    >
       <SearchResult q={searchParams.q || ""} />
     </Suspense>
   )
