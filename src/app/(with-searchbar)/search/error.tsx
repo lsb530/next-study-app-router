@@ -13,7 +13,7 @@ export default function Error({error, reset}: { error: Error; reset: () => void 
 
   return (
     <div>
-      <h3>오류가 발생했습니다</h3>
+      <h3>검색과정에서 오류가 발생했습니다</h3>
       {/*<button onClick={() => reset()}>다시 시도</button>*/}
       {/*<button onClick={() => window.location.reload()}>다시 시도</button>*/}
       <button onClick={() => {

@@ -1,7 +1,8 @@
+// app/(with-searchbar)/search/page.tsx
 import BookItem from "@/components/book-item";
-import {BookData} from "@/types";
-import {delay} from "@/util/delay";
-import {Suspense} from "react";
+import { BookData } from "@/types";
+import { delay } from "@/util/delay";
+import { Suspense } from "react";
 import BookListSkeleton from "@/components/skeleton/book-list-skeleton";
 
 // 모든 동적 페이지에서 필요한 데이터들이 undefined가 됨(ex: searchParams)
@@ -10,18 +11,18 @@ import BookListSkeleton from "@/components/skeleton/book-list-skeleton";
 // 잘못 사용할 경우에 빌드타임에 에러를 발생
 // export const dynamic = "error"
 
-async function SearchResult ({q}: {q: string}) {
-  await delay(1500)
-  const response = await fetch(`
-    ${process.env.NEXT_PUBLIC_API_SERVER_URL}/book/search?q=${q}`,
+async function SearchResult({ q }: { q: string }) {
+  await delay(1500);
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_SERVER_URL}/book/search?q=${encodeURIComponent(q)}`,
     { cache: "force-cache" }
-  )
+  );
 
   if (!response.ok) {
-    return <div>오류가 발생했습니다...</div>
+    return <div>오류가 발생했습니다...</div>;
   }
 
-  const books: BookData[] = await response.json()
+  const books: BookData[] = await response.json();
 
   return (
     <div>
@@ -29,20 +30,23 @@ async function SearchResult ({q}: {q: string}) {
         <BookItem key={book.id} {...book} />
       ))}
     </div>
-  )
+  );
 }
 
-export default function Page({
-  searchParams,
+export default async function Page({
+  // Next.js 15에서 searchParams는 비동기 API이므로 Promise로 들어옵니다
+  searchParams
 }: {
-  searchParams: { q?: string };
+  searchParams: Promise<{ q?: string }>;
 }) {
+  const { q = "" } = await searchParams;
+
   return (
     <Suspense
-      key={searchParams.q || ""}
-      fallback={<BookListSkeleton count={3}/>}
+      key={q}
+      fallback={<BookListSkeleton count={3} />}
     >
-      <SearchResult q={searchParams.q || ""} />
+      <SearchResult q={q} />
     </Suspense>
-  )
+  );
 }
