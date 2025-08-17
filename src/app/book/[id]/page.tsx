@@ -7,7 +7,7 @@ export function generateStaticParams() {
   return [{id: "1"}, {id: "2"}, {id: "3"}]
 }
 
-async function BookDetail({bookId}: {bookId: string}) {
+async function BookDetail({bookId}: { bookId: string }) {
   const response = await fetch(`
     ${process.env.NEXT_PUBLIC_API_SERVER_URL}/book/${bookId}`,
     {cache: "force-cache"}
@@ -42,20 +42,36 @@ async function BookDetail({bookId}: {bookId: string}) {
   )
 }
 
-function ReviewEditor() {
+function ReviewEditor({bookId}: { bookId: string }) {
   async function createReviewAction(formData: FormData) {
     "use server"
 
     const content = formData.get('content')?.toString()
     const author = formData.get('author')?.toString()
 
-    console.log(content, author)
+    if (!content || !author) {
+      return
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_SERVER_URL}/review`,
+        {
+          method: "POST",
+          body: JSON.stringify({ bookId, content, author })
+        }
+      )
+      console.log(response.status)
+    } catch (err) {
+      console.error(err)
+      return
+    }
   }
 
   return <section>
     <form action={createReviewAction}>
-      <input name="content" placeholder="리뷰 내용" />
-      <input name="author" placeholder="작성자" />
+      <input required name="content" placeholder="리뷰 내용"/>
+      <input required name="author" placeholder="작성자"/>
       <button type="submit">작성하기</button>
     </form>
   </section>
@@ -66,7 +82,7 @@ export default async function Page({params}: {
 }) {
   const {id} = await params
   return <div className={style.container}>
-    <BookDetail bookId={id} />
-    <ReviewEditor />
+    <BookDetail bookId={id}/>
+    <ReviewEditor bookId={id}/>
   </div>
 }
