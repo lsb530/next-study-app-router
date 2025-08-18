@@ -1,8 +1,8 @@
 import {notFound} from "next/navigation"
 import style from "./page.module.css"
-import {createReviewAction} from "@/actions/create-review.actions";
 import {ReviewData} from "@/types";
 import ReviewItem from "@/components/review-item";
+import {ReviewEditor} from "@/components/review-editor";
 
 // export const dynamicParams = false
 
@@ -43,17 +43,6 @@ async function BookDetail({bookId}: { bookId: string }) {
       <div className={style.description}>{description}</div>
     </section>
   )
-}
-
-function ReviewEditor({bookId}: { bookId: string }) {
-  return <section>
-    <form action={createReviewAction}>
-      <input readOnly hidden name="bookId" value={bookId} />
-      <input required name="content" placeholder="리뷰 내용"/>
-      <input required name="author" placeholder="작성자"/>
-      <button type="submit">작성하기</button>
-    </form>
-  </section>
 }
 
 async function ReviewList({bookId}: { bookId: string }) {
