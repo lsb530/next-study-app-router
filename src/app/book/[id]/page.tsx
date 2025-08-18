@@ -1,6 +1,8 @@
 import {notFound} from "next/navigation"
 import style from "./page.module.css"
 import {createReviewAction} from "@/actions/create-review.actions";
+import {ReviewData} from "@/types";
+import ReviewItem from "@/components/review-item";
 
 // export const dynamicParams = false
 
@@ -54,6 +56,24 @@ function ReviewEditor({bookId}: { bookId: string }) {
   </section>
 }
 
+async function ReviewList({bookId}: { bookId: string }) {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_API_SERVER_URL}/review/book/${bookId}`,
+  )
+
+  if (!response.ok) {
+    throw new Error(`Review fetch failed: ${response.statusText}`)
+  }
+
+  const reviews: ReviewData[] = await response.json()
+
+  return <section>
+    {reviews.map((review) => (
+      <ReviewItem key={`review-item-${review.id}`} {...review} />
+    ))}
+  </section>
+}
+
 export default async function Page({params}: {
   params: Promise<{ id: string }>
 }) {
@@ -61,5 +81,6 @@ export default async function Page({params}: {
   return <div className={style.container}>
     <BookDetail bookId={id}/>
     <ReviewEditor bookId={id}/>
+    <ReviewList bookId={id}/>
   </div>
 }
