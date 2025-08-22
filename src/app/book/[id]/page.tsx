@@ -1,9 +1,10 @@
 import {notFound} from "next/navigation"
 import style from "./page.module.css"
-import {ReviewData} from "@/types";
+import {BookData, ReviewData} from "@/types";
 import ReviewItem from "@/components/review-item";
 import {ReviewEditor} from "@/components/review-editor";
 import Image from "next/image";
+import {Metadata} from "next";
 
 // export const dynamicParams = false
 
@@ -64,6 +65,33 @@ async function ReviewList({bookId}: { bookId: string }) {
       <ReviewItem key={`review-item-${review.id}`} {...review} />
     ))}
   </section>
+}
+
+export async function generateMetadata(
+  {params}: {params: Promise<{ id?: string }>}
+): Promise<Metadata> {
+  // 현재 페이지 메타 데이터를 동적으로 생성하는 역할을 한다
+  const { id } = await params
+  const response = await fetch(`
+    ${process.env.NEXT_PUBLIC_API_SERVER_URL}/book/${id}`,
+    { cache: "force-cache" }
+  )
+
+  if (!response.ok) {
+    throw new Error(response.statusText)
+  }
+
+  const book: BookData = await response.json()
+
+  return {
+    title: `${book.title} - 한입 북스`,
+    description: `${book.description}`,
+    openGraph: {
+      title: `${book.title} - 한입 북스`,
+      description: `${book.description}`,
+      images: [book.coverImgUrl],
+    }
+  }
 }
 
 export default async function Page({params}: {
